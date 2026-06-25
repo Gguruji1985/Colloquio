@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aryan Jangid — Colloquio · dal progetto alla rete</title>
+<meta name="description" content="Colloquio di maturità 2026: dall'progetto MaturaAI alla sicurezza delle infrastrutture. Aryan Jangid, 5IB Informatica e Telecomunicazioni.">
+<style>
+:root{
+  --ink:#0A1622; --ink-2:#0F2031; --ink-3:#13283C; --line:#22405A;
+  --cyan:#2BD4E6; --cyan-deep:#0E7C97; --cyan-dim:#1a6e85;
+  --amber:#F0B24A; --amber-deep:#B97A1E;
+  --paper:#F4EFE6; --paper-ink:#2A2118; --paper-line:#d9cdb8;
+  --text:#E8EEF3; --muted:#93A4B3; --faint:#5d7184;
+  --green:#3FB983; --red:#E0644A;
+  --serif:"Palatino Linotype","Book Antiqua",Palatino,"URW Palladio L",Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"SFMono-Regular","Cascadia Code","JetBrains Mono",Menlo,Consolas,monospace;
+  --wrap:1120px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:84px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0; background:var(--ink); color:var(--text); font-family:var(--sans);
+  font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden}
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; line-height:1.1; margin:0}
+p{margin:0 0 1em}
+a{color:var(--cyan); text-decoration:none}
+img{max-width:100%; display:block}
+:focus-visible{outline:2px solid var(--cyan); outline-offset:3px; border-radius:4px}
+
+.wrap{max-width:var(--wrap); margin:0 auto; padding:0 28px}
+.eyebrow{font-family:var(--mono); font-size:12.5px; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--cyan); margin:0 0 14px; font-weight:600}
+.sec{position:relative; padding:108px 0; border-top:1px solid rgba(255,255,255,.05)}
+.sec h2{font-size:clamp(30px,4.6vw,46px); margin-bottom:10px; letter-spacing:-.01em}
+.sec .lede{color:var(--muted); font-size:clamp(16px,2vw,19px); max-width:60ch; margin-bottom:40px}
+.tag{font-family:var(--mono); font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--faint)}
+
+/* reveal (graceful: visible without JS) */
+.reveal{opacity:1}
+.js .reveal{opacity:0; transform:translateY(22px); transition:opacity .7s ease, transform .7s ease}
+.js .reveal.in{opacity:1; transform:none}
+.js .reveal.d1{transition-delay:.08s}.js .reveal.d2{transition-delay:.16s}.js .reveal.d3{transition-delay:.24s}
+@media (prefers-reduced-motion:reduce){.js .reveal{opacity:1;transform:none;transition:none}}
+
+/* ---------- NAV ---------- */
+.nav{position:fixed; top:0; left:0; right:0; z-index:60; height:64px; display:flex; align-items:center;
+  justify-content:space-between; padding:0 22px;
+  background:rgba(10,22,34,.72); backdrop-filter:blur(12px); border-bottom:1px solid rgba(255,255,255,.06)}
+.brand{display:flex; align-items:center; gap:11px; font-family:var(--mono); font-size:14px; letter-spacing:.04em; color:var(--text)}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--cyan); box-shadow:0 0 0 4px rgba(43,212,230,.15)}
+.brand b{font-weight:600}
+.nav-links{display:flex; gap:4px; align-items:center}
+.nav-links a{font-family:var(--mono); font-size:12px; letter-spacing:.08em; color:var(--muted); padding:8px 11px; border-radius:7px; text-transform:uppercase; transition:color .2s, background .2s}
+.nav-links a:hover{color:var(--text); background:rgba(255,255,255,.05)}
+.nav-links a.active{color:var(--ink); background:var(--cyan)}
+.nav-toggle{display:none; background:none; border:1px solid var(--line); color:var(--text); border-radius:8px; padding:8px 10px; font-family:var(--mono); font-size:12px; cursor:pointer}
+@media (max-width:900px){
+  .nav-links{position:fixed; top:64px; left:0; right:0; flex-direction:column; gap:0; background:var(--ink-2);
+    border-bottom:1px solid var(--line); padding:8px; transform:translateY(-120%); transition:transform .3s ease; max-height:80vh; overflow:auto}
+  .nav-links.open{transform:translateY(0)}
+  .nav-links a{padding:13px; border-radius:8px}
+  .nav-toggle{display:block}
+}
+
+/* ---------- SPINE (signature: il filo conduttore) ---------- */
+.spine{position:fixed; left:34px; top:0; bottom:0; width:2px; z-index:40; display:flex; align-items:center}
+.spine .track{position:relative; width:2px; height:62vh; margin:0 auto; background:rgba(255,255,255,.09); border-radius:2px}
+.spine .fill{position:absolute; top:0; left:0; width:100%; height:0;
+  background:linear-gradient(180deg,var(--cyan),#7fae8e 55%,var(--amber)); border-radius:2px; transition:height .15s linear}
+.spine .node{position:absolute; left:50%; width:11px; height:11px; margin-left:-5.5px; border-radius:50%;
+  background:var(--ink); border:2px solid var(--faint); transform:translateY(-50%); cursor:pointer; transition:all .25s}
+.spine .node[data-on="1"]{border-color:var(--cyan); background:var(--cyan); box-shadow:0 0 0 5px rgba(43,212,230,.16)}
+.spine .node:hover::after{content:attr(data-label); position:absolute; left:20px; top:50%; transform:translateY(-50%);
+  white-space:nowrap; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text);
+  background:var(--ink-3); padding:5px 9px; border-radius:6px; border:1px solid var(--line)}
+@media (max-width:1180px){.spine{display:none}}
+
+/* ---------- HERO ---------- */
+.hero{position:relative; min-height:100vh; display:flex; align-items:center; overflow:hidden; padding:120px 0 80px}
+.hero .blob{position:absolute; border-radius:50%; filter:blur(80px); opacity:.6; pointer-events:none; will-change:transform}
+.hero .b-cyan{width:560px;height:560px; left:-8%; bottom:-14%; background:radial-gradient(circle,rgba(43,212,230,.55),transparent 65%)}
+.hero .b-amber{width:520px;height:520px; right:-6%; top:-12%; background:radial-gradient(circle,rgba(240,178,74,.45),transparent 65%)}
+@media (prefers-reduced-motion:no-preference){
+  .hero .b-cyan{animation:float1 14s ease-in-out infinite}
+  .hero .b-amber{animation:float2 16s ease-in-out infinite}
+}
+@keyframes float1{50%{transform:translate(40px,-30px) scale(1.08)}}
+@keyframes float2{50%{transform:translate(-34px,28px) scale(1.06)}}
+.hero .grid-ov{position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px); background-size:46px 46px; mask-image:radial-gradient(circle at 50% 40%,#000,transparent 78%)}
+.hero .inner{position:relative; z-index:2; width:100%}
+.hero h1{font-size:clamp(36px,6.6vw,76px); letter-spacing:-.02em; max-width:16ch}
+.hero h1 .pg{color:var(--cyan)} .hero h1 .dr{color:var(--amber)}
+.hero .sub{margin:26px 0 0; font-size:clamp(16px,2.2vw,21px); color:var(--muted); max-width:58ch}
+.duality{display:flex; align-items:center; gap:14px; margin:30px 0 36px; font-family:var(--mono); font-size:12px; letter-spacing:.2em; text-transform:uppercase}
+.duality .pg{color:var(--cyan)} .duality .dr{color:var(--amber)}
+.duality .ln{flex:0 0 64px; height:2px; background:linear-gradient(90deg,var(--cyan),var(--amber))}
+.who{font-family:var(--mono); font-size:13px; color:var(--faint); letter-spacing:.04em; margin-top:38px}
+.who b{color:var(--text); font-weight:600}
+.cta-row{display:flex; gap:14px; flex-wrap:wrap; margin-top:30px}
+.btn{display:inline-flex; align-items:center; gap:9px; font-family:var(--mono); font-size:13px; letter-spacing:.06em;
+  padding:13px 20px; border-radius:10px; cursor:pointer; border:1px solid transparent; transition:transform .15s, background .2s, border-color .2s; text-transform:uppercase}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--cyan); color:var(--ink); font-weight:700}
+.btn-primary:hover{background:#5fe1ef}
+.btn-ghost{border-color:var(--line); color:var(--text)}
+.btn-ghost:hover{border-color:var(--cyan); color:var(--cyan)}
+.btn-amber{background:var(--amber); color:#2a1c06; font-weight:700}
+.scroll-hint{position:absolute; left:50%; bottom:26px; transform:translateX(-50%); z-index:3; font-family:var(--mono); font-size:10.5px; letter-spacing:.25em; color:var(--faint); text-transform:uppercase; display:flex; flex-direction:column; align-items:center; gap:8px}
+.scroll-hint .m{width:1px;height:30px;background:linear-gradient(var(--cyan),transparent)}
+@media (prefers-reduced-motion:no-preference){.scroll-hint .m{animation:drop 1.8s ease-in-out infinite}}
+@keyframes drop{0%{opacity:.2;transform:scaleY(.4)}50%{opacity:1}100%{opacity:.2;transform:scaleY(.4) translateY(20px)}}
+
+/* ---------- shared building blocks ---------- */
+.grid{display:grid; gap:18px}
+.cols-2{grid-template-columns:1fr 1fr}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:860px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+.card{background:var(--ink-2); border:1px solid rgba(255,255,255,.07); border-radius:16px; padding:24px}
+.card h3{font-size:20px; margin-bottom:8px}
+.card .tag{display:block; margin-bottom:12px}
+.chip{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; letter-spacing:.04em;
+  padding:7px 12px; border-radius:999px; background:rgba(43,212,230,.1); color:var(--cyan); border:1px solid rgba(43,212,230,.25)}
+.chip.am{background:rgba(240,178,74,.1); color:var(--amber); border-color:rgba(240,178,74,.28)}
+.chips{display:flex; flex-wrap:wrap; gap:9px}
+.ic{flex:0 0 auto; width:46px; height:46px; border-radius:12px; display:grid; place-items:center; background:rgba(43,212,230,.12); color:var(--cyan)}
+.ic.am{background:rgba(240,178,74,.12); color:var(--amber)}
+.ic svg{width:23px;height:23px}
+ul.tick{list-style:none; padding:0; margin:0}
+ul.tick li{position:relative; padding:7px 0 7px 26px; color:var(--text); border-bottom:1px solid rgba(255,255,255,.05)}
+ul.tick li:last-child{border-bottom:0}
+ul.tick li::before{content:""; position:absolute; left:4px; top:15px; width:8px; height:8px; border-radius:50%; background:var(--cyan)}
+ul.tick.am li::before{background:var(--amber)}
+ul.tick.warn li::before{background:var(--red)}
+.bridge{margin-top:26px; padding:18px 22px; border-radius:14px; border-left:3px solid var(--amber);
+  background:linear-gradient(90deg,rgba(240,178,74,.1),transparent); color:var(--text); font-size:15.5px}
+.bridge b{color:var(--amber)}
+
+/* ---------- CV ---------- */
+.cv-head{display:flex; align-items:center; gap:20px; margin-bottom:34px; flex-wrap:wrap}
+.cv-ava{width:84px;height:84px;border-radius:50%;border:2px solid var(--cyan); object-fit:cover; background:var(--ink-3)}
+.cv-ava.fallback{display:grid;place-items:center;font-family:var(--serif);font-size:32px;color:var(--cyan)}
+.dossier{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
+@media (max-width:760px){.dossier{grid-template-columns:1fr}}
+.dterm{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--cyan); margin-bottom:8px}
+
+/* ---------- GITHUB (terminal) ---------- */
+.sec--github{background:linear-gradient(180deg,#08131f,#0a1726)}
+.term{background:#071019; border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:0 30px 70px rgba(0,0,0,.4)}
+.term-bar{display:flex; align-items:center; gap:8px; padding:12px 16px; background:#0c1c2c; border-bottom:1px solid var(--line)}
+.term-bar i{width:11px;height:11px;border-radius:50%;display:block}
+.term-bar .r{background:#e0644a}.term-bar .y{background:#f0b24a}.term-bar .g{background:#3fb983}
+.term-bar span{margin-left:10px; font-family:var(--mono); font-size:12px; color:var(--faint)}
+.term-body{padding:20px; font-family:var(--mono); font-size:13.5px; line-height:1.8}
+.term-body .pr{color:var(--green)} .term-body .cm{color:var(--muted)} .term-body .cy{color:var(--cyan)}
+.gh-profile{display:flex; gap:18px; align-items:center; margin:22px 0; flex-wrap:wrap}
+.gh-profile img{width:64px;height:64px;border-radius:12px;border:1px solid var(--line)}
+.gh-stats{display:flex; gap:22px; font-family:var(--mono); font-size:13px; color:var(--muted)}
+.gh-stats b{color:var(--cyan); font-size:18px; display:block; font-family:var(--sans)}
+.repo-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:8px}
+@media (max-width:760px){.repo-grid{grid-template-columns:1fr}}
+.repo{display:block; background:var(--ink-2); border:1px solid rgba(255,255,255,.08); border-radius:13px; padding:18px; transition:border-color .2s, transform .15s}
+.repo:hover{border-color:var(--cyan); transform:translateY(-3px)}
+.repo .nm{font-family:var(--mono); font-size:14.5px; color:var(--cyan); font-weight:600; display:flex; align-items:center; gap:8px}
+.repo .ds{color:var(--muted); font-size:13.5px; margin:8px 0 12px; min-height:34px}
+.repo .meta{display:flex; gap:16px; font-family:var(--mono); font-size:11.5px; color:var(--faint); align-items:center}
+.repo .lang::before{content:""; display:inline-block; width:9px;height:9px;border-radius:50%; background:var(--amber); margin-right:5px; vertical-align:middle}
+.repo .live{color:var(--green)}
+
+/* ---------- MATURAAI ---------- */
+.sec--matura{background:radial-gradient(ellipse at 70% 0%,rgba(43,212,230,.07),transparent 60%)}
+.prod-head{display:grid; grid-template-columns:1.1fr .9fr; gap:34px; align-items:start}
+@media (max-width:900px){.prod-head{grid-template-columns:1fr}}
+.browser{border-radius:14px; overflow:hidden; border:1px solid var(--line); background:#0c1c2c; box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.browser-bar{display:flex; align-items:center; gap:7px; padding:10px 14px; background:#0c1c2c; border-bottom:1px solid var(--line)}
+.browser-bar i{width:10px;height:10px;border-radius:50%}
+.browser-url{flex:1; margin-left:8px; background:#071019; border-radius:7px; padding:6px 12px; font-family:var(--mono); font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:7px}
+.browser-frame{position:relative; width:100%; aspect-ratio:16/10; background:var(--ink)}
+.browser-frame iframe{position:absolute; inset:0; width:100%; height:100%; border:0; background:#fff}
+.demo-fallback{position:absolute; inset:0; display:grid; place-items:center; text-align:center; padding:24px; gap:14px; background:linear-gradient(135deg,var(--ink-3),var(--ink)); }
+.demo-note{margin-top:12px; font-family:var(--mono); font-size:11.5px; color:var(--faint); display:flex; align-items:center; gap:8px}
+.flow{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:8px 0 4px}
+@media (max-width:760px){.flow{grid-template-columns:1fr 1fr}}
+.flow .step{background:var(--ink-2); border:1px solid var(--line); border-radius:11px; padding:13px 10px; text-align:center}
+.flow .step .n{font-family:var(--serif); font-size:20px; color:var(--cyan)}
+.flow .step .t{font-size:12.5px; margin-top:4px}
+.provs{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+@media (max-width:760px){.provs{grid-template-columns:1fr 1fr}}
+.prov{background:var(--ink-2); border:1px solid var(--line); border-radius:12px; padding:16px; text-align:center}
+.prov .nm{font-family:var(--mono); font-weight:600; font-size:13.5px; margin-top:8px}
+.prov .ds{font-size:11.5px; color:var(--muted); margin-top:3px}
+
+/* ---------- RETI (network) ---------- */
+.sec--reti{background:linear-gradient(180deg,#0a1726,#08131f)}
+.netbox{border:1px solid var(--line); border-radius:16px; background:#071019; padding:26px; margin-bottom:28px; overflow:hidden}
+.netbox svg{width:100%; height:auto; display:block}
+.pkt-c{fill:var(--cyan)} .pkt-a{fill:var(--amber)}
+.nlabel{font-family:var(--mono); font-size:11px; fill:var(--muted); letter-spacing:.05em}
+.ntitle{font-family:var(--mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--cyan); margin-bottom:6px}
+
+/* ---------- ENGLISH ---------- */
+.sec--english{background:radial-gradient(ellipse at 15% 10%,rgba(43,212,230,.06),transparent 55%),radial-gradient(ellipse at 90% 90%,rgba(240,178,74,.06),transparent 55%)}
+.blueprint{background:#071019;
+  background-image:linear-gradient(rgba(43,212,230,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(43,212,230,.08) 1px,transparent 1px);
+  background-size:24px 24px; border:1px solid var(--cyan-dim); border-radius:14px; padding:22px}
+.blueprint .dterm{color:var(--cyan)}
+.surveil{position:relative; background:linear-gradient(135deg,#05080b,#0c0d10); border:1px solid #2a2d33; border-radius:14px; padding:30px; overflow:hidden; color:#cfd4d9}
+.surveil::after{content:""; position:absolute; inset:0; background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 4px); pointer-events:none}
+@media (prefers-reduced-motion:no-preference){.surveil .scan{position:absolute; left:0; right:0; height:60px; background:linear-gradient(rgba(240,178,74,.12),transparent); top:-60px; animation:scan 5s linear infinite}}
+@keyframes scan{to{top:100%}}
+.eye{width:120px;height:120px;margin:0 auto 18px; position:relative; display:grid; place-items:center}
+.eye .ring{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); border-radius:50%; border:1.5px solid rgba(240,178,74,.4)}
+.eye .iris{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 50% 50%,var(--amber),#7a4d12); position:relative; z-index:2}
+.eye .iris::after{content:""; position:absolute; inset:34%; background:#05080b; border-radius:50%}
+.quote-1984{font-family:var(--serif); font-style:italic; font-size:26px; text-align:center; color:#fff; margin:6px 0 4px; letter-spacing:.01em}
+.quote-cap{text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--amber)}
+
+/* ---------- ITALIANO (cinema, warm paper) ---------- */
+.sec--italiano{background:var(--paper); color:var(--paper-ink)}
+.sec--italiano h2,.sec--italiano h3{color:var(--paper-ink)}
+.sec--italiano .eyebrow{color:var(--amber-deep)}
+.sec--italiano .lede{color:#6b5d49}
+.sec--italiano .tag{color:#9a8b72}
+.sec--italiano::before{content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background-image:radial-gradient(rgba(120,90,40,.10) 1px,transparent 1px); background-size:3px 3px}
+.filmstrip{position:relative; background:#16120c; border-radius:10px; padding:16px 12px; display:flex; gap:10px; overflow:hidden}
+.filmstrip::before,.filmstrip::after{content:""; position:absolute; left:0; right:0; height:14px;
+  background-image:radial-gradient(#16120c 38%,transparent 39%); background-size:22px 14px; background-position:center; }
+.filmstrip::before{top:2px; background-color:#0d0a06}
+.filmstrip::after{bottom:2px; background-color:#0d0a06}
+.frame-i{flex:1; aspect-ratio:4/3; border-radius:4px; background:linear-gradient(135deg,#4a3a26,#241a10); display:grid; place-items:center; color:#caa86a; min-height:70px}
+.crank{display:flex; align-items:center; gap:16px; margin:6px 0 22px}
+.crank svg{width:84px;height:84px}
+@media (prefers-reduced-motion:no-preference){.crank .gear{transform-origin:50% 50%; animation:spin 7s linear infinite}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.card-paper{background:#fbf7ef; border:1px solid var(--paper-line); border-radius:16px; padding:24px; box-shadow:0 12px 30px rgba(80,60,30,.08)}
+.card-paper h3{color:var(--paper-ink)}
+.card-paper .dterm{color:var(--amber-deep)}
+ul.serif{list-style:none;padding:0;margin:0}
+ul.serif li{padding:7px 0 7px 24px; position:relative; border-bottom:1px solid var(--paper-line); color:#3a2f20}
+ul.serif li:last-child{border-bottom:0}
+ul.serif li::before{content:"—"; position:absolute; left:0; color:var(--amber-deep)}
+.bigquote{font-family:var(--serif); font-style:italic; font-size:clamp(24px,3.4vw,34px); color:var(--paper-ink); line-height:1.25; margin:8px 0; max-width:18ch}
+.bigquote .src{display:block; font-style:normal; font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber-deep); margin-top:14px}
+.bridge.paper{border-left-color:var(--amber-deep); background:linear-gradient(90deg,rgba(185,122,30,.12),transparent); color:#3a2f20}
+.bridge.paper b{color:var(--amber-deep)}
+
+/* ---------- CIVICA (legal + pyramid) ---------- */
+.sec--civica{background:radial-gradient(ellipse at 50% 0%,rgba(240,178,74,.07),transparent 60%)}
+.pyramid{display:flex; flex-direction:column; align-items:center; gap:6px}
+.tier{height:62px; display:grid; place-items:center; color:#fff; font-family:var(--mono); font-size:12.5px; letter-spacing:.05em;
+  text-transform:uppercase; cursor:pointer; border:none; transition:filter .2s, transform .15s; clip-path:polygon(8% 0,92% 0,100% 100%,0 100%); width:100%}
+.tier:hover,.tier[aria-current="true"]{filter:brightness(1.18); transform:scale(1.02)}
+.t1{background:var(--red); width:42%} .t2{background:var(--amber-deep); width:60%}
+.t3{background:var(--cyan-deep); width:80%} .t4{background:var(--green); width:100%}
+.pyr-detail{background:var(--ink-2); border:1px solid var(--line); border-radius:14px; padding:22px; min-height:120px}
+.pyr-detail .dterm{color:var(--amber)}
+.art-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:760px){.art-grid{grid-template-columns:1fr}; .prod-head{gap:24px}}
+.artn{font-family:var(--serif); font-size:19px; color:var(--amber); font-weight:700}
+
+/* ---------- EXPLAINER (approfondimenti) ---------- */
+.xpl{background:var(--ink-3); border:1px solid rgba(255,255,255,.07); border-left:3px solid var(--cyan); border-radius:0 12px 12px 0; padding:18px 22px; margin:14px 0}
+.xpl h4{font-family:var(--sans); font-weight:700; font-size:15.5px; color:var(--cyan); margin:0 0 8px}
+.xpl p{font-size:14.5px; color:var(--text); margin:0 0 .7em; line-height:1.66}
+.xpl p:last-child{margin:0}
+.xpl ul{margin:.2em 0 .2em; padding-left:18px}
+.xpl li{margin:.3em 0; color:var(--muted); font-size:14px; line-height:1.5}
+.xpl .k{font-family:var(--mono); font-size:.88em; color:var(--cyan); background:rgba(43,212,230,.08); padding:1px 6px; border-radius:5px}
+.xpl.am{border-left-color:var(--amber)} .xpl.am h4{color:var(--amber)} .xpl.am .k{color:var(--amber); background:rgba(240,178,74,.08)}
+.xpl.paper{background:#fbf7ef; border:1px solid var(--paper-line); border-left:3px solid var(--amber-deep)}
+.xpl.paper h4{color:var(--amber-deep)} .xpl.paper p{color:#3a2f20} .xpl.paper li{color:#6b5d49} .xpl.paper .k{color:#7a4d12; background:rgba(185,122,30,.1)}
+.xpl-h{font-family:var(--mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); margin:42px 0 12px}
+.sec--italiano .xpl-h{color:#9a8b72}
+
+/* ---------- FOOTER ---------- */
+.foot{position:relative; padding:96px 0 60px; text-align:center; background:linear-gradient(180deg,var(--ink),#070f18); border-top:1px solid rgba(255,255,255,.06); overflow:hidden}
+.foot .b1{position:absolute; width:480px;height:480px;border-radius:50%; filter:blur(90px); left:30%; top:-30%; background:radial-gradient(circle,rgba(43,212,230,.28),transparent 65%)}
+.foot .b2{position:absolute; width:460px;height:460px;border-radius:50%; filter:blur(90px); right:30%; top:-20%; background:radial-gradient(circle,rgba(240,178,74,.24),transparent 65%)}
+.foot .thesis{position:relative; font-family:var(--serif); font-style:italic; font-size:clamp(24px,3.8vw,40px); max-width:20ch; margin:0 auto 26px; line-height:1.2}
+.foot .thesis .pg{color:var(--cyan)} .foot .thesis .dr{color:var(--amber)}
+.foot .sub{position:relative; color:var(--muted); max-width:60ch; margin:0 auto 30px}
+.foot .links{position:relative; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:34px}
+.foot .grazie{position:relative; font-family:var(--serif); font-size:54px; color:var(--text)}
+.foot .fine{position:relative; font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--faint); margin-top:18px}
+</style>
+</head>
+<body>
+
+<!-- SPINE -->
+<div class="spine" aria-hidden="true">
+  <div class="track">
+    <div class="fill" id="spineFill"></div>
+    <span class="node" data-t="home"     data-label="Home"            style="top:2%"></span>
+    <span class="node" data-t="cv"        data-label="01 · Chi sono"   style="top:16%"></span>
+    <span class="node" data-t="github"    data-label="02 · Codice"     style="top:30%"></span>
+    <span class="node" data-t="maturai"   data-label="03 · MaturaAI"   style="top:44%"></span>
+    <span class="node" data-t="reti"      data-label="04 · Reti"       style="top:58%"></span>
+    <span class="node" data-t="english"   data-label="05 · English"    style="top:71%"></span>
+    <span class="node" data-t="italiano"  data-label="06 · Italiano"   style="top:85%"></span>
+    <span class="node" data-t="civica"    data-label="07 · Civica"     style="top:99%"></span>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <a class="brand" href="#home"><span class="dot"></span> <b>Aryan&nbsp;Jangid</b> · colloquio</a>
+  <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">Menu</button>
+  <nav class="nav-links" id="navLinks">
+    <a href="#cv">Chi sono</a>
+    <a href="#github">Codice</a>
+    <a href="#maturai">MaturaAI</a>
+    <a href="#reti">Reti</a>
+    <a href="#english">English</a>
+    <a href="#italiano">Italiano</a>
+    <a href="#civica">Civica</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ===== HERO ===== -->
+<section id="home" class="hero">
+  <div class="blob b-cyan" id="blobC"></div>
+  <div class="blob b-amber" id="blobA"></div>
+  <div class="grid-ov"></div>
+  <div class="wrap inner">
+    <p class="eyebrow reveal">Esame di Stato 2026 · Colloquio orale</p>
+    <h1 class="reveal d1">L'intelligenza artificiale, dal <span class="pg">progetto</span> alla <span class="pg">rete</span></h1>
+    <p class="sub reveal d2">Un percorso che parte da un progetto reale — <b>MaturaAI</b> — e arriva alla sicurezza delle infrastrutture critiche. Questa pagina è essa stessa il progetto: codice, non slide.</p>
+    <div class="cta-row reveal d3">
+      <a class="btn btn-primary" href="#cv">Esplora il percorso</a>
+      <a class="btn btn-amber" href="https://gguruji1985.github.io/Esame" target="_blank" rel="noopener">Apri MaturaAI ↗</a>
+      <a class="btn btn-ghost" href="https://gguruji1985.github.io/CV" target="_blank" rel="noopener">CV ↗</a>
+    </div>
+    <p class="who reveal d3"><b>Aryan Jangid</b> &nbsp;·&nbsp; 5IB Informatica e Telecomunicazioni &nbsp;·&nbsp; I.S. «Pitagora», Pozzuoli</p>
+  </div>
+  <div class="scroll-hint"><span>scorri</span><span class="m"></span></div>
+</section>
+
+<!-- ===== 01 CV ===== -->
+<section id="cv" class="sec sec--cv">
+  <div class="wrap">
+    <p class="eyebrow reveal">01 — Chi sono</p>
+    <div class="cv-head reveal d1">
+      <div class="cv-ava fallback" id="cvAva" role="img" aria-label="Aryan Jangid">AJ</div>
+      <div>
+        <h2 style="margin-bottom:4px">Aryan Jangid</h2>
+        <p class="tag" style="margin:0">Studente · futuro ingegnere · cybersecurity OT/ICS</p>
+      </div>
+    </div>
+    <p class="lede reveal d1">Studente di Informatica e Telecomunicazioni con un obiettivo preciso: la sicurezza delle reti industriali e delle infrastrutture critiche. Imparo costruendo strumenti reali.</p>
+    <div class="dossier">
+      <div class="card reveal"><div class="dterm">Formazione</div>5ª — Informatica e Telecomunicazioni, I.S. «Pitagora» (Pozzuoli). Esame di Stato 2026.</div>
+      <div class="card reveal d1"><div class="dterm">Obiettivo</div>Cybersecurity OT/ICS: proteggere reti industriali, SCADA/PLC e infrastrutture critiche.</div>
+      <div class="card reveal"><div class="dterm">Certificazioni</div>Cisco NetAcad (IoT · Cybersecurity · Networking · Industrial · Modern AI · Digital Safety) · EIPASS 7 Moduli · Patente droni ENAC/EASA A1–A3.</div>
+      <div class="card reveal d1"><div class="dterm">Pratica</div>TryHackMe — CTF: privilege escalation, JWT, RCE, forensics · progetti reali in produzione · corso GOL, Centro ARES (ex-base NATO, Bagnoli).</div>
+      <div class="card reveal"><div class="dterm">Competenze</div>Reti &amp; Sistemi · Sicurezza informatica · Sviluppo (JavaScript, PHP, SQL) · IoT &amp; Droni.</div>
+      <div class="card reveal d1"><div class="dterm">Lingue</div>Italiano · English. &nbsp; <span class="tag">Contatti →</span> <a href="https://github.com/Gguruji1985" target="_blank" rel="noopener">github.com/Gguruji1985</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 02 GITHUB ===== -->
+<section id="github" class="sec sec--github">
+  <div class="wrap">
+    <p class="eyebrow reveal">02 — Il codice</p>
+    <h2 class="reveal">Quello che ho costruito</h2>
+    <p class="lede reveal d1">Non solo teoria: progetti pubblici, versionati e online. Profilo e repository in tempo reale da GitHub.</p>
+    <div class="term reveal d1">
+      <div class="term-bar"><i class="r"></i><i class="y"></i><i class="g"></i><span>aryan@pitagora: ~/projects</span></div>
+      <div class="term-body">
+        <div><span class="pr">➜</span> <span class="cy">git</span> log --author="aryan" --oneline --graph</div>
+        <div id="ghProfile" class="gh-profile">
+          <div class="gh-stats"><div><b>—</b>repository</div><div><b>—</b>follower</div></div>
+        </div>
+        <div><span class="cm"># repository in evidenza</span></div>
+      </div>
+    </div>
+    <div class="repo-grid" id="ghRepos">
+      <a class="repo" href="https://gguruji1985.github.io/Esame" target="_blank" rel="noopener"><span class="nm">⭐ Esame · MaturaAI</span><span class="ds">Simulatore d'esame di maturità con AI · 4 provider.</span><span class="meta"><span class="lang">HTML</span><span class="live">● live</span></span></a>
+      <a class="repo" href="https://github.com/Gguruji1985/structura" target="_blank" rel="noopener"><span class="nm">structura</span><span class="ds">Analizzatore di strutture organizzative con AI.</span><span class="meta"><span class="lang">JavaScript</span></span></a>
+      <a class="repo" href="https://github.com/Gguruji1985/Law-based-game" target="_blank" rel="noopener"><span class="nm">Law-based-game</span><span class="ds">Gioco a tema giuridico, creato con l'AI.</span><span class="meta"><span class="lang">HTML</span></span></a>
+      <a class="repo" href="https://gguruji1985.github.io/study-tracker" target="_blank" rel="noopener"><span class="nm">study-tracker</span><span class="ds">Tracker di studio orientato ai progetti.</span><span class="meta"><span class="lang">HTML</span><span class="live">● live</span></span></a>
+      <a class="repo" href="https://github.com/Gguruji1985/quiz-patente" target="_blank" rel="noopener"><span class="nm">quiz-patente</span><span class="ds">App di quiz per la patente B.</span><span class="meta"><span class="lang">JavaScript</span></span></a>
+      <a class="repo" href="https://github.com/Gguruji1985/CV" target="_blank" rel="noopener"><span class="nm">CV</span><span class="ds">Il mio curriculum come sito web.</span><span class="meta"><span class="lang">HTML</span></span></a>
+    </div>
+    <div class="xpl-h reveal">Come tengo in ordine il codice</div>
+    <div class="grid cols-2">
+      <div class="xpl reveal"><h4>Che cos'è Git</h4><p><span class="k">Git</span> è un sistema di <b>controllo di versione</b>: registra ogni modifica al codice nel tempo. Ogni salvataggio significativo è un <span class="k">commit</span>, una «fotografia» del progetto a cui posso sempre tornare.</p><p>Posso lavorare su linee parallele (i <span class="k">branch</span>) senza rompere la versione funzionante, e vedere esattamente cosa è cambiato, quando e perché. È lo standard con cui lavora tutto il mondo dello sviluppo.</p></div>
+      <div class="xpl reveal"><h4>Che cos'è GitHub</h4><p><span class="k">GitHub</span> è la piattaforma che ospita online i miei repository Git. Serve a <b>conservare</b>, <b>condividere</b> e <b>collaborare</b> sul codice, e funziona da portfolio pubblico e verificabile del mio lavoro.</p><p>Da GitHub parte anche GitHub Pages, che pubblica i miei progetti come siti web: codice e sito vivono nello stesso posto.</p></div>
+    </div>
+    <div class="xpl reveal"><h4>Questa stessa pagina usa l'API di GitHub</h4><p>Il profilo e i progetti qui sopra non sono scritti a mano: la pagina li richiede in tempo reale all'<b>API REST di GitHub</b> — la stessa logica di chiamata che uso in MaturaAI. È una piccola dimostrazione concreta di cosa significhi «consumare» un'API.</p></div>
+    <p class="tag reveal" style="margin-top:18px">→ <a href="https://github.com/Gguruji1985" target="_blank" rel="noopener">github.com/Gguruji1985</a></p>
+  </div>
+</section>
+
+<!-- ===== 03 MATURAAI ===== -->
+<section id="maturai" class="sec sec--matura">
+  <div class="wrap">
+    <p class="eyebrow reveal">03 — Informatica · il capolavoro</p>
+    <div class="prod-head">
+      <div>
+        <h2 class="reveal">MaturaAI</h2>
+        <p class="lede reveal d1" style="margin-bottom:22px">Un simulatore d'esame basato sull'intelligenza artificiale: genera tracce originali, simula le prove e dà un feedback immediato con criteri di valutazione.</p>
+        <div class="chips reveal d1" style="margin-bottom:22px"><span class="chip">Vanilla JS</span><span class="chip">GitHub Pages</span><span class="chip am">API REST</span><span class="chip am">Multi-provider</span></div>
+        <div class="grid cols-2" style="gap:14px">
+          <div class="card reveal"><div class="dterm" style="color:var(--red)">Il problema</div><ul class="tick warn"><li>Poca pratica realistica</li><li>Feedback lento</li><li>Simulazioni generiche</li></ul></div>
+          <div class="card reveal d1"><div class="dterm" style="color:var(--green)">La soluzione</div><ul class="tick"><li>Tracce su misura</li><li>Correzione istantanea</li><li>Tutte le materie</li></ul></div>
+        </div>
+      </div>
+      <div class="reveal d2">
+        <div class="browser">
+          <div class="browser-bar"><i style="background:#e0644a"></i><i style="background:#f0b24a"></i><i style="background:#3fb983"></i>
+            <span class="browser-url">🔒 gguruji1985.github.io/Esame</span></div>
+          <div class="browser-frame">
+            <iframe src="https://gguruji1985.github.io/Esame" title="Demo live di MaturaAI" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+        <p class="demo-note">demo live ·&nbsp;<a href="https://gguruji1985.github.io/Esame" target="_blank" rel="noopener">apri in una nuova scheda ↗</a></p>
+      </div>
+    </div>
+
+    <div class="xpl-h reveal">Le scelte tecniche — perché così</div>
+    <div class="grid cols-2">
+      <div class="xpl reveal"><h4>Perché ho scelto HTML</h4><p><span class="k">HTML</span> (HyperText Markup Language) è il linguaggio che descrive la <b>struttura</b> e il <b>contenuto</b> di una pagina: titoli, paragrafi, pulsanti, campi. Non è un linguaggio di programmazione ma di marcatura: dico al browser «questo è un titolo, questo è un bottone» e lui sa come rappresentarlo.</p><p>È il fondamento di qualunque cosa giri in un browser: senza HTML non esiste pagina web. Per MaturaAI serviva un'interfaccia raggiungibile ovunque, e il web è la piattaforma più universale che ci sia.</p></div>
+      <div class="xpl reveal"><h4>Perché ho separato il CSS</h4><p><span class="k">CSS</span> (Cascading Style Sheets) gestisce l'<b>aspetto</b>: colori, font, spaziature, animazioni, layout. Tengo struttura (HTML) e stile (CSS) separati per il principio di <b>separazione delle responsabilità</b>: ogni linguaggio fa una cosa sola, e la fa bene.</p><p>Così posso ridisegnare completamente l'interfaccia senza toccare la logica, e il codice resta leggibile e mantenibile nel tempo.</p></div>
+    </div>
+    <div class="xpl reveal"><h4>Perché Vanilla JavaScript (e non un framework come React)</h4><p><span class="k">JavaScript</span> è il linguaggio che dà <b>comportamento</b> alla pagina: reagisce ai clic, chiama le API, aggiorna i contenuti in tempo reale. «<b>Vanilla</b>» significa JavaScript puro, senza librerie o framework esterni come React, Vue o Angular.</p><p>È una scelta consapevole. Un framework aggiunge potenza ma anche peso, dipendenze e complessità. Per un progetto di questa dimensione il vanilla mi dà <b>controllo totale</b>, caricamento immediato e zero dipendenze da aggiornare.</p><p>Soprattutto mi obbliga a capire <b>come funzionano davvero le cose</b> — il DOM, gli eventi, le chiamate asincrone — invece di nasconderle dietro l'astrazione di un framework. Per imparare, è la strada migliore.</p></div>
+    <div class="xpl reveal"><h4>Perché GitHub Pages come hosting</h4><p>MaturaAI è un sito <b>statico</b>: file HTML, CSS e JS serviti così come sono, senza un server che elabora a ogni richiesta. <span class="k">GitHub Pages</span> ospita gratuitamente questo tipo di siti direttamente dal repository del codice.</p><p>A ogni <span class="k">commit</span> il sito online si aggiorna da solo. Gratis, sempre disponibile, con HTTPS incluso: ideale per un progetto scolastico accessibile a chiunque.</p></div>
+
+    <h3 class="reveal" style="margin:46px 0 16px; font-size:22px">Come funziona</h3>
+    <div class="flow reveal d1">
+      <div class="step"><div class="n">1</div><div class="t">Scegli la prova</div></div>
+      <div class="step"><div class="n">2</div><div class="t">Costruisci il prompt</div></div>
+      <div class="step"><div class="n">3</div><div class="t">Chiamata API</div></div>
+      <div class="step"><div class="n">4</div><div class="t">Risposta AI</div></div>
+      <div class="step"><div class="n">5</div><div class="t">Feedback</div></div>
+    </div>
+
+    <div class="xpl-h reveal">Come l'app parla con l'intelligenza artificiale</div>
+    <div class="xpl reveal"><h4>Che cos'è un'API</h4><p><span class="k">API</span> sta per <b>Application Programming Interface</b>: è il modo in cui due programmi si parlano. È come il menù di un ristorante — io (il programma) non entro in cucina: ordino dal menù e ricevo il piatto. Non devo sapere <i>come</i> è fatto, mi basta conoscere cosa posso chiedere e cosa ricevo.</p><p>I modelli di Claude, OpenAI, Gemini e Groq girano su server enormi, irraggiungibili dal mio computer. La loro API è la «finestra» ufficiale: mando una domanda, ricevo la risposta del modello.</p></div>
+    <div class="xpl reveal"><h4>Un'API REST, nel dettaglio</h4><p>Le API che uso sono di tipo <span class="k">REST</span>, lo standard del web. Si appoggiano a <b>HTTP</b> (lo stesso protocollo dei siti) e si basano su tre idee: si chiama un <b>endpoint</b> (un indirizzo preciso), si usa un <b>metodo</b> (per inviare dati si usa <span class="k">POST</span>), e ogni richiesta è <b>indipendente</b> dalle altre (stateless).</p><p>Lo stesso schema vale per tutti e quattro i provider: cambiano l'indirizzo e qualche dettaglio, ma la logica è identica. Per questo ho potuto integrarne quattro senza riscrivere tutto.</p></div>
+    <div class="xpl reveal"><h4>L'anatomia di una richiesta</h4><p>Una chiamata API è fatta di pezzi precisi:</p><ul><li><b>Endpoint</b> — l'URL del servizio, es. <span class="k">/v1/messages</span></li><li><b>Header</b> — informazioni di servizio, fra cui la <b>chiave API</b> che mi identifica e autorizza</li><li><b>Body</b> — i dati veri, in formato JSON: quale modello voglio e i messaggi da inviare</li><li><b>Risposta</b> — di nuovo JSON, con il testo generato dal modello</li></ul></div>
+    <div class="xpl reveal"><h4>Che cos'è il JSON</h4><p><span class="k">JSON</span> (JavaScript Object Notation) è il formato con cui i dati viaggiano in rete: testo strutturato in coppie <b>chiave: valore</b>, leggibile sia dalle persone sia dalle macchine.</p><p>È diventato lo standard perché è leggero, universale e ogni linguaggio sa leggerlo e scriverlo. La mia richiesta parte come JSON e la risposta torna come JSON.</p></div>
+    <div class="xpl reveal"><h4>Come il codice effettua la chiamata: <span class="k">fetch</span> e <span class="k">async</span></h4><p>In JavaScript uso la funzione <span class="k">fetch()</span> per inviare la richiesta. Ma la rete richiede tempo: la risposta non è immediata. Per questo la chiamata è <b>asincrona</b> — il programma non si blocca ad aspettare, continua a funzionare e gestisce la risposta quando arriva.</p><p>Uso le parole chiave <span class="k">async</span> e <span class="k">await</span> per scrivere questo codice in modo leggibile: «invia la richiesta, attendi la risposta senza congelare la pagina, poi mostrala». È un concetto centrale della programmazione web moderna.</p></div>
+
+    <h3 class="reveal" style="margin:40px 0 16px; font-size:22px">Un'app, quattro motori AI</h3>
+    <div class="provs reveal d1">
+      <div class="prov"><div class="ic" style="margin:0 auto">🧠</div><div class="nm">Claude</div><div class="ds">ragionamento · italiano</div></div>
+      <div class="prov"><div class="ic" style="margin:0 auto">🤖</div><div class="nm">OpenAI</div><div class="ds">ecosistema versatile</div></div>
+      <div class="prov"><div class="ic am" style="margin:0 auto">✦</div><div class="nm">Gemini</div><div class="ds">multimodale · free tier</div></div>
+      <div class="prov"><div class="ic am" style="margin:0 auto">⚡</div><div class="nm">Groq</div><div class="ds">velocità elevata</div></div>
+    </div>
+
+    <div class="xpl-h reveal">Capire il «motore»</div>
+    <div class="grid cols-2">
+      <div class="xpl reveal"><h4>Che cos'è un modello linguistico (LLM)</h4><p>Dietro ogni provider c'è un <b>Large Language Model</b>: un modello addestrato su enormi quantità di testo, che ha imparato le regolarità statistiche della lingua. In pratica, dato un testo, <b>predice la parola più probabile successiva</b>, una dopo l'altra.</p><p>Non «capisce» come un essere umano e non consulta un archivio di verità: genera la continuazione più plausibile. Questo lo rende sorprendentemente capace, ma anche fallibile.</p></div>
+      <div class="xpl reveal am"><h4>Perché a volte «allucina»</h4><p>Le <b>allucinazioni</b> sono risposte sbagliate dette con sicurezza: date, nomi o fatti inventati. Accade proprio perché il modello cerca la risposta più <i>plausibile</i>, non quella più <i>vera</i>: se non «sa», riempie il vuoto.</p><p>Per questo MaturaAI è un aiuto allo studio, non un oracolo: lo studente deve sempre verificare. È anche il motivo per cui l'AI Act impone la <b>trasparenza</b> — sapere che si sta parlando con un'AI.</p></div>
+    </div>
+
+    <div class="grid cols-2" style="margin-top:34px">
+      <div class="card reveal"><div class="dterm" style="color:var(--green)">Vantaggi</div><ul class="tick"><li>Gratuito e accessibile</li><li>Personalizzato e multi-modello</li><li>Nessuna installazione · valore didattico</li></ul></div>
+      <div class="card reveal d1"><div class="dterm" style="color:var(--red)">Limiti &amp; sfide</div><ul class="tick warn"><li>Richiede una chiave API · dipende dai provider</li><li>Accuratezza variabile (allucinazioni)</li><li>Chiave lato client = rischio di sicurezza</li></ul></div>
+    </div>
+    <div class="xpl reveal am"><h4>Il rischio della chiave lato client</h4><p>MaturaAI è un sito statico: la chiamata all'API parte direttamente dal browser dell'utente. Questo significa che la <b>chiave API</b> è presente nel codice che gira sul client, quindi potenzialmente <b>visibile</b>. È il limite di sicurezza più serio del progetto, ed è onesto dirlo.</p><p>La soluzione professionale è un <b>backend proxy</b>: un piccolo server intermedio che custodisce la chiave al sicuro. Il browser parla con il mio server, il mio server parla con l'API: la chiave non lascia mai un ambiente protetto. È esattamente il ragionamento che porta a <b>Sistemi e Reti</b>.</p></div>
+    <div class="bridge reveal">La <b>chiave lato client</b> è un problema di sicurezza reale: la soluzione è un backend proxy. Da qui si passa naturalmente a <b>Sistemi e Reti</b>.</div>
+  </div>
+</section>
+
+<!-- ===== 04 SISTEMI E RETI ===== -->
+<section id="reti" class="sec sec--reti">
+  <div class="wrap">
+    <p class="eyebrow reveal">04 — Sistemi e Reti</p>
+    <h2 class="reveal">Lo strato di rete del progetto</h2>
+    <p class="lede reveal d1">Ogni traccia di MaturaAI è un viaggio sulla rete: dal browser al modello AI e ritorno, in modo sicuro.</p>
+    <div class="netbox reveal d1">
+      <svg viewBox="0 0 1000 210" role="img" aria-label="Percorso di una richiesta di rete: client, DNS, TLS, server">
+        <text x="90" y="30" class="nlabel" fill="#2BD4E6">richiesta →</text>
+        <text x="910" y="196" class="nlabel" text-anchor="end" fill="#F0B24A">← risposta</text>
+        <line x1="90" y1="105" x2="910" y2="105" stroke="#22405A" stroke-width="2"/>
+        <g>
+          <circle cx="90"  cy="105" r="32" fill="#0F2031" stroke="#2BD4E6" stroke-width="2"/>
+          <circle cx="363" cy="105" r="32" fill="#0F2031" stroke="#2BD4E6" stroke-width="2"/>
+          <circle cx="636" cy="105" r="32" fill="#0F2031" stroke="#2BD4E6" stroke-width="2"/>
+          <circle cx="910" cy="105" r="32" fill="#0F2031" stroke="#F0B24A" stroke-width="2"/>
+          <text x="90"  y="110" text-anchor="middle" class="nlabel" fill="#E8EEF3" font-size="13">CLIENT</text>
+          <text x="363" y="110" text-anchor="middle" class="nlabel" fill="#E8EEF3" font-size="14">DNS</text>
+          <text x="636" y="110" text-anchor="middle" class="nlabel" fill="#E8EEF3" font-size="14">TLS</text>
+          <text x="910" y="110" text-anchor="middle" class="nlabel" fill="#E8EEF3" font-size="13">SERVER</text>
+          <text x="90"  y="165" text-anchor="middle" class="nlabel">browser · MaturaAI</text>
+          <text x="363" y="165" text-anchor="middle" class="nlabel">dominio → IP</text>
+          <text x="636" y="165" text-anchor="middle" class="nlabel">canale cifrato</text>
+          <text x="910" y="165" text-anchor="middle" class="nlabel">API del modello</text>
+        </g>
+        <circle r="7" class="pkt-c"><animate attributeName="cx" values="90;910" dur="3.4s" repeatCount="indefinite"/><animate attributeName="cy" values="105;105" dur="3.4s" repeatCount="indefinite"/></circle>
+        <circle r="7" class="pkt-a"><animate attributeName="cx" values="910;90" dur="3.4s" begin="1.7s" repeatCount="indefinite"/><animate attributeName="cy" values="120;120" dur="3.4s" begin="1.7s" repeatCount="indefinite"/></circle>
+      </svg>
+    </div>
+    <div class="grid cols-2">
+      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h3 style="margin-top:14px">Client – Server</h3><p class="tag">richiesta · risposta</p><p style="font-size:14.5px;color:var(--muted);margin:0">Sito statico su GitHub Pages: è il browser a chiamare le API. HTTP è stateless, i dati viaggiano in JSON.</p></div>
+      <div class="card reveal d1"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><h3 style="margin-top:14px">HTTPS / TLS</h3><p class="tag">il canale sicuro</p><p style="font-size:14.5px;color:var(--muted);margin:0">Handshake → chiave condivisa → canale cifrato. Garantisce riservatezza, integrità e autenticità del server.</p></div>
+      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><h3 style="margin-top:14px">DNS</h3><p class="tag">la rubrica di internet</p><p style="font-size:14.5px;color:var(--muted);margin:0">Dal dominio all'indirizzo IP. Esperienza diretta: ho configurato il DNS di <span style="font-family:var(--mono);color:var(--cyan)">armarinesrls.it</span>.</p></div>
+      <div class="card reveal d1"><div class="ic am"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v18M16 3v18M3 8h18M3 16h18"/></svg></div><h3 style="margin-top:14px">Una richiesta API</h3><p class="tag">endpoint · header · JSON</p><p style="font-size:14.5px;color:var(--muted);margin:0">Endpoint, chiave nell'header, corpo JSON con modello e messaggi, risposta JSON. Lo stesso schema per ogni provider.</p></div>
+    </div>
+    <div class="xpl-h reveal">Le basi della rete, spiegate</div>
+    <div class="xpl reveal"><h4>Che cos'è una rete e che cos'è Internet</h4><p>Una <b>rete</b> è un insieme di dispositivi collegati che possono scambiarsi dati. <span class="k">Internet</span> è «la rete delle reti»: milioni di reti locali collegate tra loro in tutto il mondo, che parlano una lingua comune fatta di <b>protocolli</b> condivisi.</p><p>Quando apro MaturaAI, il mio dispositivo entra in questa rete globale per raggiungere i server dei modelli AI, ovunque si trovino.</p></div>
+    <div class="xpl reveal"><h4>Il modello client-server</h4><p>È l'architettura su cui si regge il web. Il <b>client</b> (il mio browser) <b>chiede</b>; il <b>server</b> (un computer sempre acceso e raggiungibile) <b>risponde</b>. È sempre il client ad avviare la conversazione, mentre il server serve molti client contemporaneamente.</p><p>In MaturaAI il browser è il client e l'API del modello è il server. Tutta la pagina è costruita attorno a questo dialogo richiesta-risposta.</p></div>
+    <div class="xpl reveal"><h4>HTTP: la lingua del web</h4><p><span class="k">HTTP</span> (HyperText Transfer Protocol) è il protocollo con cui client e server si parlano. Definisce dei <b>metodi</b>: <span class="k">GET</span> per chiedere dati, <span class="k">POST</span> per inviarne. Ogni risposta porta un <b>codice di stato</b>: <span class="k">200</span> tutto ok, <span class="k">404</span> non trovato, <span class="k">401</span> non autorizzato, <span class="k">500</span> errore del server.</p><p>HTTP è <b>stateless</b>: ogni richiesta è a sé, il server non «ricorda» la precedente. Lo stato — chi sei, cosa hai fatto — va gestito a parte, ad esempio con dei token.</p></div>
+    <div class="xpl reveal"><h4>Che cos'è un'API (sul piano di rete)</h4><p>Un'<b>API</b> è l'interfaccia con cui un programma offre i suoi servizi ad altri programmi attraverso la rete. Sul web, un'API <b>REST</b> non è altro che un insieme di indirizzi (endpoint) che si chiamano via HTTP e che rispondono con dati strutturati in <b>JSON</b>.</p><p>È il punto esatto in cui il mio progetto di Informatica e la teoria delle reti si toccano: la chiamata API è, sotto, un pacchetto HTTP che attraversa Internet fino al server giusto e torna indietro.</p></div>
+    <div class="xpl reveal am"><h4>HTTPS e TLS: il handshake passo per passo</h4><p><span class="k">HTTPS</span> è HTTP dentro un canale cifrato da <span class="k">TLS</span>. Prima di scambiare dati, client e server eseguono un <b>handshake</b> (stretta di mano):</p><ul><li>Il client saluta e dichiara quali algoritmi di cifratura supporta</li><li>Il server risponde e invia il suo <b>certificato digitale</b></li><li>Il client lo verifica tramite un'<b>Autorità di Certificazione (CA)</b> fidata: ha la garanzia che il server sia davvero chi dice di essere</li><li>Si concorda una <b>chiave di sessione</b> condivisa</li><li>Da qui in poi tutto viaggia cifrato</li></ul><p>Il trucco: si usa la <b>crittografia asimmetrica</b> (chiave pubblica/privata) solo per scambiare in sicurezza la chiave; poi si passa alla <b>crittografia simmetrica</b>, molto più veloce, per i dati veri. TLS garantisce tre cose: <b>riservatezza</b>, <b>integrità</b> e <b>autenticità</b>.</p></div>
+    <div class="xpl reveal"><h4>Il DNS: la risoluzione passo per passo</h4><p>Noi ricordiamo i nomi (<span class="k">api.anthropic.com</span>), le macchine usano numeri (gli indirizzi IP). Il <span class="k">DNS</span> (Domain Name System) è la rubrica che traduce l'uno nell'altro. Quando inserisco un dominio:</p><ul><li>Il browser controlla la propria cache, poi il sistema operativo</li><li>Se non lo trova, interroga un <b>resolver</b> (di solito del provider)</li><li>Il resolver chiede a un <b>root server</b>, poi al server del dominio di primo livello (<span class="k">.it</span>, <span class="k">.com</span>)</li><li>Infine il <b>server autoritativo</b> restituisce l'indirizzo IP (record <span class="k">A</span>)</li></ul><p>Ho toccato tutto questo con mano configurando i record DNS del dominio <span class="k">armarinesrls.it</span>.</p></div>
+    <div class="xpl reveal"><h4>Indirizzi IP e porte</h4><p>Ogni dispositivo in rete ha un <b>indirizzo IP</b> che lo identifica (es. <span class="k">142.250.180.4</span> in IPv4). La <b>porta</b> indica invece quale servizio sulla macchina: il web usa la porta <span class="k">443</span> per HTTPS e la <span class="k">80</span> per HTTP.</p><p>IP e porta insieme individuano con precisione «con chi» e «per quale servizio» sto parlando.</p></div>
+    <div class="xpl reveal"><h4>I modelli ISO/OSI e TCP/IP</h4><p>Per dominare la complessità, le reti sono pensate a <b>livelli</b>. Il modello <span class="k">ISO/OSI</span> ne ha sette (Fisico, Collegamento, Rete, Trasporto, Sessione, Presentazione, Applicazione); il modello <span class="k">TCP/IP</span>, quello realmente usato, li raggruppa in quattro.</p><p>L'idea chiave: ogni livello ha un compito e si appoggia a quello sottostante. <b>IP</b> instrada i pacchetti, <b>TCP</b> garantisce che arrivino tutti e in ordine, HTTP ci mette sopra il significato. Una richiesta di MaturaAI attraversa tutti questi livelli, in discesa e in salita.</p></div>
+    <div class="xpl reveal am"><h4>Firewall e NAT: i guardiani</h4><p>Un <b>firewall</b> è un filtro che decide quale traffico può passare, in base a regole su indirizzi, porte e protocolli. Il <b>NAT</b> (Network Address Translation) consente a molti dispositivi di una rete privata di condividere un unico indirizzo pubblico, nascondendo la struttura interna.</p><p>Sono i primi mattoni della sicurezza di rete — e il ponte diretto verso il mio obiettivo: proteggere le reti industriali.</p></div>
+    <div class="xpl reveal am"><h4>Dalla rete IT alle infrastrutture OT/ICS</h4><p>Il mio obiettivo è la cybersecurity <span class="k">OT/ICS</span>: <b>Operational Technology</b> e <b>Industrial Control Systems</b>, cioè i sistemi che controllano impianti fisici — fabbriche, energia, acqua. Al loro cuore ci sono gli <b>SCADA</b> (supervisione e controllo) e i <b>PLC</b> (i piccoli computer che comandano macchinari e valvole).</p><p>La grande differenza con l'IT: in ufficio la priorità è la <b>riservatezza</b> dei dati; in un impianto la priorità è la <b>continuità</b> e la <b>sicurezza fisica</b> — un attacco può fermare una linea o causare danni reali. Stessa logica crittografica vista per TLS, ma con poste in gioco molto più alte. È qui che voglio lavorare.</p></div>
+
+    <div class="bridge reveal">La crittografia che protegge i dati di MaturaAI è la stessa logica che, su scala industriale, difende le <b>infrastrutture critiche OT/ICS</b> — il mio obiettivo professionale.</div>
+  </div>
+</section>
+
+<!-- ===== 05 ENGLISH ===== -->
+<section id="english" class="sec sec--english">
+  <div class="wrap">
+    <p class="eyebrow reveal">05 — English</p>
+    <h2 class="reveal">Specifying software — and a warning from 1949</h2>
+    <p class="lede reveal d1">From user requirements to a technical blueprint — and the dystopia George Orwell imagined in 1949.</p>
+
+    <div class="grid cols-2" style="margin-bottom:18px">
+      <div class="blueprint reveal"><div class="dterm">URS — User Requirements</div><ul class="tick"><li>What the user needs, in plain language</li><li>The client's point of view</li><li>The "what" &amp; the "why"</li></ul></div>
+      <div class="blueprint reveal d1"><div class="dterm">SRS — Software Requirements</div><ul class="tick"><li>The detailed technical blueprint</li><li>Functional + non-functional</li><li>How the system must behave</li></ul></div>
+    </div>
+    <div class="grid cols-2" style="margin-bottom:30px">
+      <div class="card reveal"><div class="dterm" style="color:var(--cyan)">MaturaAI · functional</div><ul class="tick"><li>Generate exam tasks</li><li>Simulate exams · instant feedback</li><li>Switch AI provider</li></ul></div>
+      <div class="card reveal d1"><div class="dterm" style="color:var(--amber)">MaturaAI · non-functional</div><ul class="tick am"><li>Usability · performance</li><li>Security of API keys</li><li>Availability · accessibility</li></ul></div>
+    </div>
+
+    <div class="xpl-h reveal">Requirements engineering — in depth</div>
+    <div class="xpl reveal"><h4>URS vs SRS: who they are for</h4><p>The <span class="k">URS</span> (User Requirements Specification) is written for and with the <b>client</b>, in plain language. It answers <i>what</i> the user needs and <i>why</i>. The <span class="k">SRS</span> (Software Requirements Specification) is the engineer's <b>technical translation</b> of those needs: precise, measurable, ready to build from.</p><p>The URS is the promise; the SRS is the blueprint. One feeds the other.</p></div>
+    <div class="xpl reveal"><h4>Functional vs non-functional requirements</h4><p><b>Functional</b> requirements describe <i>what the system does</i> — concrete features. For MaturaAI: generate a task, simulate an exam, give feedback, switch AI provider.</p><p><b>Non-functional</b> requirements describe <i>how well</i> it does it — the qualities: usability, performance, security, availability, accessibility. They are often what separates a working prototype from a real product.</p></div>
+    <div class="xpl reveal am"><h4>Why this matters</h4><p>Clear requirements prevent the most expensive mistake in software: building the wrong thing. Writing the URS and SRS for MaturaAI forced me to think like an engineer <i>before</i> writing a single line of code — exactly the discipline this topic is about.</p></div>
+    <div style="height:34px"></div>
+
+    <div class="grid cols-2">
+      <div class="reveal">
+        <h3 style="font-size:22px;margin-bottom:10px">George Orwell — <em>1984</em></h3>
+        <p style="color:var(--muted);font-size:15px">A totalitarian Party. Telescreens in every home. The Thought Police. <em>Newspeak</em> controlling truth. Orwell imagines technology as the instrument of total control — and warns where it leads.</p>
+        <p style="color:var(--muted);font-size:15px">From <em>1984</em> to the data age, Orwell's warning about technology and power still resonates: mass tracking, AI profiling, disinformation. The same tools that drive progress can become instruments of control — it depends on how we choose to use them.</p>
+        <p style="color:var(--muted);font-size:15px;margin:0"><b style="color:#fff">Newspeak</b>, the regime's shrinking language, captures his deepest idea: control the words and you control thought itself. <em>1984</em> (1949) is the classic <b>dystopian novel</b> — fiction that imagines a dark future to warn the present.</p>
+      </div>
+      <div class="surveil reveal d1">
+        <div class="scan"></div>
+        <div class="eye"><span class="ring" style="width:120px;height:120px"></span><span class="ring" style="width:84px;height:84px"></span><span class="iris"></span></div>
+        <div class="quote-1984">« Big Brother is watching you »</div>
+        <div class="quote-cap">Orwell · 1984</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 06 ITALIANO ===== -->
+<section id="italiano" class="sec sec--italiano">
+  <div class="wrap">
+    <p class="eyebrow reveal">06 — Italiano · Luigi Pirandello</p>
+    <h2 class="reveal">L'uomo e la macchina</h2>
+    <p class="lede reveal d1">Un secolo prima dell'AI, Pirandello racconta l'angoscia del progresso che spersonalizza l'individuo.</p>
+
+    <div class="grid cols-2" style="margin-bottom:28px">
+      <div class="card-paper reveal">
+        <div class="dterm">L'autore</div>
+        <h3 style="margin-bottom:6px">Luigi Pirandello</h3>
+        <p style="color:#6b5d49;font-size:14px;margin-bottom:12px">1867–1936 · Premio Nobel 1934</p>
+        <ul class="serif">
+          <li>La maschera: l'identità imposta dagli altri</li>
+          <li>Vita vs forma: la vita fluisce, la forma imprigiona</li>
+          <li>Relativismo: non esiste una sola verità</li>
+          <li>L'incomunicabilità tra le persone</li>
+        </ul>
+      </div>
+      <div class="card-paper reveal d1">
+        <div class="dterm">L'opera</div>
+        <h3 style="margin-bottom:6px">Quaderni di Serafino Gubbio operatore</h3>
+        <p style="color:#6b5d49;font-size:14px;margin-bottom:14px">Romanzo, 1916</p>
+        <div class="crank" aria-hidden="true">
+          <svg viewBox="0 0 120 120">
+            <g class="gear" fill="none" stroke="#16120c" stroke-width="4">
+              <circle cx="60" cy="60" r="40"/>
+              <circle cx="60" cy="60" r="9" fill="#16120c"/>
+              <circle cx="86" cy="60" r="5" fill="#fbf7ef"/><circle cx="73" cy="82.5" r="5" fill="#fbf7ef"/>
+              <circle cx="47" cy="82.5" r="5" fill="#fbf7ef"/><circle cx="34" cy="60" r="5" fill="#fbf7ef"/>
+              <circle cx="47" cy="37.5" r="5" fill="#fbf7ef"/><circle cx="73" cy="37.5" r="5" fill="#fbf7ef"/>
+              <line x1="60" y1="60" x2="104" y2="60"/><circle cx="104" cy="60" r="6" fill="#B97A1E" stroke="none"/>
+            </g>
+          </svg>
+          <p style="color:#3a2f20;font-size:14.5px;margin:0">Serafino gira la manovella della macchina da presa. Registra tutto con fredda impassibilità, finché l'uomo diventa pura funzione del meccanismo.</p>
+        </div>
+        <div class="filmstrip"><div class="frame-i">▶</div><div class="frame-i">▶</div><div class="frame-i">▶</div></div>
+      </div>
+    </div>
+
+    <div class="xpl-h reveal">Approfondimenti</div>
+    <div class="grid cols-2">
+      <div class="xpl paper reveal"><h4>Il contesto: la crisi delle certezze</h4><p>Pirandello scrive nel primo Novecento, l'<b>età dell'ansia</b>: la fiducia ottocentesca nel progresso e nella scienza entra in crisi. La relatività di Einstein, la psicoanalisi di Freud, la Prima guerra mondiale fanno crollare l'idea di una realtà unica e oggettiva.</p><p>Nasce il <b>relativismo</b>: la verità non è una, dipende dal punto di vista. È il terreno da cui germoglia tutta la sua opera.</p></div>
+      <div class="xpl paper reveal"><h4>La poetica: vita, forma, maschera</h4><p>L'idea centrale è il contrasto tra <b>vita</b> e <b>forma</b>. La vita è flusso continuo e mutevole; ma la società ci costringe in una <b>forma</b> fissa — un ruolo, un nome, un'immagine. Quella forma è la <b>maschera</b> che gli altri ci impongono, dietro cui la vera identità soffoca.</p><p>Da qui i suoi grandi temi: l'identità frantumata, la solitudine, l'<b>incomunicabilità</b> tra le persone.</p></div>
+    </div>
+    <div class="xpl paper reveal"><h4>L'umorismo e il «sentimento del contrario»</h4><p>Per Pirandello l'<b>umorismo</b> non è far ridere: è vedere il rovescio delle cose. Davanti a una vecchia signora truccata da ragazza, il comico mi fa ridere — è l'«avvertimento del contrario»; ma se penso al suo dolore, al perché lo fa, il riso si trasforma in pietà: è il <b>«sentimento del contrario»</b>.</p><p>È uno sguardo che scava sotto l'apparenza — lo stesso con cui osserva l'uomo schiacciato dalla macchina.</p></div>
+    <div class="xpl paper reveal"><h4>La trama: Serafino Gubbio operatore</h4><p>Serafino è un <b>operatore cinematografico</b>: il suo lavoro è girare la manovella della macchina da presa, registrando ciò che gli accade davanti con totale impassibilità. Ridotto a semplice ingranaggio, perde emozioni e iniziativa: è la macchina a comandare, lui è solo «una mano che gira una manovella».</p><p>Nel finale, durante una scena reale di violenza, continua a riprendere senza intervenire: l'uomo-macchina ha smarrito perfino la propria umanità. La tecnologia, da strumento, è diventata padrona.</p></div>
+    <div class="xpl paper reveal"><h4>Il collegamento con la mia tesi</h4><p>Un secolo prima dell'intelligenza artificiale, Pirandello mette in scena l'angoscia che proviamo oggi: il <b>progresso tecnico che rischia di spersonalizzare l'uomo</b>, riducendolo a funzione di un meccanismo. È il rovescio oscuro del progresso.</p><p>La differenza, allora come oggi, la fa <b>chi resta al centro</b>: se l'uomo padroneggia lo strumento, la macchina lo potenzia; se ne diventa appendice, lo annulla. È la stessa domanda che mi pongo davanti all'AI.</p></div>
+
+    <div class="bigquote reveal">« una mano che gira una manovella »<span class="src">Pirandello · l'uomo asservito alla macchina</span></div>
+    <div class="bridge paper reveal">La stessa angoscia, oggi, davanti all'intelligenza artificiale: il rischio di ridurre la <b>persona a pura funzione</b>. La differenza la fa l'uomo che resta padrone dello strumento — non sua appendice.</div>
+  </div>
+</section>
+
+<!-- ===== 07 CIVICA ===== -->
+<section id="civica" class="sec sec--civica">
+  <div class="wrap">
+    <p class="eyebrow reveal">07 — Educazione Civica</p>
+    <h2 class="reveal">Le regole che governano la tecnologia</h2>
+    <p class="lede reveal d1">Perché il progresso resti «giusto»: protezione dei dati, regole sull'AI, diritti fondamentali.</p>
+
+    <div class="grid cols-2" style="margin-bottom:30px">
+      <div class="card reveal"><div class="dterm" style="color:var(--cyan)">GDPR · Reg. UE 2016/679</div><div class="grid cols-2" style="gap:10px"><ul class="tick"><li>Consenso · liceità</li><li>Minimizzazione</li><li>Finalità · sicurezza</li></ul><ul class="tick am"><li>Accesso · rettifica</li><li>Oblio · portabilità</li><li>Opposizione</li></ul></div><p style="font-size:13.5px;color:var(--muted);margin:14px 0 0">I dati inviati ai modelli AI sono dati personali.</p></div>
+      <div class="card reveal d1"><div class="dterm" style="color:var(--amber)">EU AI Act · Reg. UE 2024/1689</div>
+        <div class="pyramid" style="margin:8px 0 14px">
+          <button class="tier t1" data-d="Pratiche vietate perché incompatibili con i diritti (es. social scoring statale).">Inaccettabile</button>
+          <button class="tier t2" data-d="Sanità, lavoro, istruzione, sicurezza: obblighi stringenti di trasparenza, controllo umano e gestione del rischio.">Alto rischio</button>
+          <button class="tier t3" data-d="Sistemi come i chatbot: obbligo di trasparenza, l'utente deve sapere che parla con un'AI.">Rischio limitato</button>
+          <button class="tier t4" data-d="La maggior parte delle applicazioni: uso libero, senza obblighi particolari.">Rischio minimo</button>
+        </div>
+        <div class="pyr-detail" id="pyrDetail" aria-live="polite"><div class="dterm">Approccio basato sul rischio</div><span style="color:var(--muted);font-size:14px">Tocca un livello della piramide. Più alto è il rischio per i diritti, più severi sono gli obblighi: la legge non ferma l'innovazione, la incanala.</span></div>
+      </div>
+    </div>
+
+    <div class="xpl-h reveal">Le norme, spiegate</div>
+    <div class="xpl reveal"><h4>GDPR: cosa protegge e come</h4><p>Il <span class="k">GDPR</span> (Regolamento UE 2016/679) è la legge europea sulla <b>protezione dei dati personali</b>. Un dato personale è qualsiasi informazione che identifica una persona: nome, email, ma anche ciò che scrivo in un prompt. Anche i dati inviati a un'AI ricadono qui.</p><p>Si fonda su principi come <b>liceità</b> e consenso, <b>minimizzazione</b> (raccogliere solo il necessario), limitazione delle finalità e sicurezza. E garantisce diritti concreti: accesso, rettifica, <b>diritto all'oblio</b>, portabilità, opposizione.</p></div>
+    <div class="xpl reveal am"><h4>EU AI Act: la regolazione basata sul rischio</h4><p>L'<span class="k">AI Act</span> (Regolamento UE 2024/1689) è la prima legge organica al mondo sull'intelligenza artificiale. Non vieta la tecnologia: la <b>classifica per livello di rischio</b> e impone obblighi proporzionati — più alto è il rischio per le persone, più severe le regole.</p><p>Pratiche <b>inaccettabili</b> vietate; sistemi ad <b>alto rischio</b> (sanità, lavoro, istruzione) con obblighi stringenti di trasparenza e controllo umano; <b>rischio limitato</b> (i chatbot) con l'obbligo di dichiarare che si parla con un'AI; <b>rischio minimo</b> libero. La legge incanala l'innovazione, non la ferma.</p></div>
+
+    <h3 class="reveal" style="font-size:22px;margin-bottom:16px">I fondamenti</h3>
+    <div class="art-grid reveal d1">
+      <div class="card"><div class="dterm">Costituzione italiana</div><p style="margin:0;color:var(--muted);font-size:14.5px"><span class="artn">Art. 2</span> diritti inviolabili · <span class="artn">13</span> libertà personale · <span class="artn">15</span> segretezza della corrispondenza · <span class="artn">21</span> libertà di pensiero</p></div>
+      <div class="card"><div class="dterm">Dichiarazione Universale · 1948</div><p style="margin:0;color:var(--muted);font-size:14.5px"><span class="artn">Art. 12</span> vita privata · <span class="artn">19</span> libertà di espressione · <span class="artn">26</span> diritto all'istruzione</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="foot">
+  <div class="b1"></div><div class="b2"></div>
+  <div class="wrap">
+    <p class="thesis reveal">« Capire una tecnologia significa saperla <span class="pg">costruire</span> — e saperla <span class="pg">proteggere</span>. »</p>
+    <p class="sub reveal d1">Dalla sicurezza dei dati a quella delle infrastrutture critiche. AR Marine — l'officina di famiglia — è il mio primo ambiente OT reale. Obiettivo: cybersecurity OT/ICS.</p>
+    <div class="links reveal d1">
+      <a class="btn btn-ghost" href="https://github.com/Gguruji1985" target="_blank" rel="noopener">GitHub ↗</a>
+      <a class="btn btn-ghost" href="https://gguruji1985.github.io/Esame" target="_blank" rel="noopener">MaturaAI ↗</a>
+      <a class="btn btn-ghost" href="https://gguruji1985.github.io/CV" target="_blank" rel="noopener">CV ↗</a>
+    </div>
+    <p class="grazie reveal">Grazie.</p>
+    <p class="fine">Aryan Jangid · Esame di Stato 2026 · I.S. Pitagora</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement; root.classList.add("js");
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* nav toggle */
+  var tg=document.getElementById("navToggle"), links=document.getElementById("navLinks");
+  if(tg){tg.addEventListener("click",function(){var o=links.classList.toggle("open");tg.setAttribute("aria-expanded",o);});}
+  links&&links.querySelectorAll("a").forEach(function(a){a.addEventListener("click",function(){links.classList.remove("open");tg&&tg.setAttribute("aria-expanded",false);});});
+
+  /* reveal on scroll */
+  var revs=document.querySelectorAll(".reveal");
+  if("IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12,rootMargin:"0px 0px -8% 0px"});
+    revs.forEach(function(el){io.observe(el);});
+  } else { revs.forEach(function(el){el.classList.add("in");}); }
+
+  /* scroll-spy: nav + spine + progress fill */
+  var sections=["home","cv","github","maturai","reti","english","italiano","civica"].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  var navMap={}; document.querySelectorAll(".nav-links a").forEach(function(a){navMap[a.getAttribute("href").slice(1)]=a;});
+  var nodes={}; document.querySelectorAll(".spine .node").forEach(function(n){nodes[n.getAttribute("data-t")]=n; n.addEventListener("click",function(){var t=document.getElementById(n.getAttribute("data-t")); t&&t.scrollIntoView({behavior:reduce?"auto":"smooth"});});});
+  var fill=document.getElementById("spineFill");
+  function onScroll(){
+    var y=window.scrollY||window.pageYOffset, vh=window.innerHeight, mid=y+vh*0.35, cur="home";
+    for(var i=0;i<sections.length;i++){ if(sections[i].offsetTop<=mid) cur=sections[i].id; }
+    Object.keys(navMap).forEach(function(k){navMap[k].classList.toggle("active",k===cur);});
+    Object.keys(nodes).forEach(function(k){nodes[k].setAttribute("data-on",k===cur?"1":"0");});
+    var h=document.body.scrollHeight-vh; if(fill) fill.style.height=Math.max(0,Math.min(1,y/h))*100+"%";
+  }
+  window.addEventListener("scroll",onScroll,{passive:true}); window.addEventListener("resize",onScroll); onScroll();
+
+  /* hero parallax */
+  if(!reduce){
+    var bc=document.getElementById("blobC"), ba=document.getElementById("blobA"), hero=document.getElementById("home");
+    hero&&hero.addEventListener("mousemove",function(e){
+      var x=(e.clientX/window.innerWidth-.5), y2=(e.clientY/window.innerHeight-.5);
+      if(bc) bc.style.transform="translate("+(x*36)+"px,"+(y2*30)+"px)";
+      if(ba) ba.style.transform="translate("+(x*-30)+"px,"+(y2*-26)+"px)";
+    });
+  }
+
+  /* AI Act pyramid */
+  var tiers=document.querySelectorAll(".tier"), det=document.getElementById("pyrDetail");
+  tiers.forEach(function(t){
+    function show(){tiers.forEach(function(x){x.setAttribute("aria-current","false");}); t.setAttribute("aria-current","true");
+      if(det) det.innerHTML='<div class="dterm">'+t.textContent+'</div><span style="color:var(--text);font-size:14.5px">'+t.getAttribute("data-d")+'</span>';}
+    t.addEventListener("mouseenter",show); t.addEventListener("click",show); t.addEventListener("focus",show);
+  });
+
+  /* GitHub: live profile + repos (unauthenticated, with static fallback already in DOM) */
+  var USER="Gguruji1985";
+  fetch("https://api.github.com/users/"+USER).then(function(r){return r.ok?r.json():Promise.reject();}).then(function(u){
+    var p=document.getElementById("ghProfile");
+    if(p){p.innerHTML='<img src="'+u.avatar_url+'" alt="avatar"><div><div style="font-family:var(--mono);color:var(--text);font-size:15px">@'+u.login+'</div><div style="color:var(--muted);font-size:13px;margin:3px 0 8px">'+(u.bio||"Studente · sviluppo &amp; cybersecurity")+'</div><div class="gh-stats"><div><b>'+u.public_repos+'</b>repository</div><div><b>'+u.followers+'</b>follower</div></div></div>';}
+  }).catch(function(){});
+
+  var PINS=["Esame","structura","Law-based-game","study-tracker","quiz-patente","CV"];
+  var DESC={"esame":"Simulatore d'esame di maturità con AI · 4 provider","structura":"Analizzatore di strutture organizzative con AI","law-based-game":"Gioco a tema giuridico, creato con l'AI","study-tracker":"Tracker di studio orientato ai progetti","quiz-patente":"App di quiz per la patente B","cv":"Il mio curriculum come sito web"};
+  fetch("https://api.github.com/users/"+USER+"/repos?per_page=100&sort=updated").then(function(r){return r.ok?r.json():Promise.reject();}).then(function(repos){
+    if(!Array.isArray(repos)) return;
+    var byName={}; repos.forEach(function(r){byName[r.name.toLowerCase()]=r;});
+    var picked=PINS.map(function(n){return byName[n.toLowerCase()];}).filter(Boolean);
+    if(picked.length<3) return; // not enough resolved → keep static fallback
+    var grid=document.getElementById("ghRepos"); if(!grid) return;
+    grid.innerHTML=picked.map(function(r){
+      var key=r.name.toLowerCase();
+      var flag=/esame/i.test(r.name)?"⭐ ":"";
+      var nm=/esame/i.test(r.name)?"Esame · MaturaAI":r.name;
+      var ds=DESC[key]||r.description||"—";
+      var live=r.homepage?'<span class="live">● live</span>':'';
+      var lang=r.language?'<span class="lang">'+r.language+'</span>':'';
+      var star=r.stargazers_count?'<span>★ '+r.stargazers_count+'</span>':'';
+      var url=r.homepage||r.html_url;
+      return '<a class="repo" href="'+url+'" target="_blank" rel="noopener"><span class="nm">'+flag+nm+'</span><span class="ds">'+ds+'</span><span class="meta">'+lang+star+live+'</span></a>';
+    }).join("");
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>
