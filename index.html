@@ -345,7 +345,7 @@ ul.serif li::before{content:"—"; position:absolute; left:0; color:var(--amber-
   <div class="wrap">
     <p class="eyebrow reveal">01 — Chi sono</p>
     <div class="cv-head reveal d1">
-      <div class="cv-ava fallback" id="cvAva" role="img" aria-label="Aryan Jangid">AJ</div>
+      <img class="cv-ava" id="cvAva" src="" alt="Aryan Jangid" style="display:none">
       <div>
         <h2 style="margin-bottom:4px">Aryan Jangid</h2>
         <p class="tag" style="margin:0">Studente · futuro ingegnere · cybersecurity OT/ICS</p>
@@ -358,7 +358,7 @@ ul.serif li::before{content:"—"; position:absolute; left:0; color:var(--amber-
       <div class="card reveal"><div class="dterm">Certificazioni</div>Cisco NetAcad (IoT · Cybersecurity · Networking · Industrial · Modern AI · Digital Safety) · EIPASS 7 Moduli · Patente droni ENAC/EASA A1–A3.</div>
       <div class="card reveal d1"><div class="dterm">Pratica</div>TryHackMe — CTF: privilege escalation, JWT, RCE, forensics · progetti reali in produzione · corso GOL, Centro ARES (ex-base NATO, Bagnoli).</div>
       <div class="card reveal"><div class="dterm">Competenze</div>Reti &amp; Sistemi · Sicurezza informatica · Sviluppo (JavaScript, PHP, SQL) · IoT &amp; Droni.</div>
-      <div class="card reveal d1"><div class="dterm">Lingue</div>Italiano · English. &nbsp; <span class="tag">Contatti →</span> <a href="https://github.com/Gguruji1985" target="_blank" rel="noopener">github.com/Gguruji1985</a></div>
+      <div class="card reveal d1"><div class="dterm">Lingue</div>Italiano · English.<br><br><a class="btn btn-primary" href="https://gguruji1985.github.io/CV" target="_blank" rel="noopener" style="margin-top:8px;font-size:12px;padding:10px 16px">CV completo ↗</a></div>
     </div>
   </div>
 </section>
@@ -717,9 +717,17 @@ ul.serif li::before{content:"—"; position:absolute; left:0; color:var(--amber-
   /* GitHub: live profile + repos (unauthenticated, with static fallback already in DOM) */
   var USER="Gguruji1985";
   fetch("https://api.github.com/users/"+USER).then(function(r){return r.ok?r.json():Promise.reject();}).then(function(u){
+    /* avatar in CV section */
+    var av=document.getElementById("cvAva");
+    if(av&&u.avatar_url){av.src=u.avatar_url;av.style.display="block";av.onerror=function(){av.replaceWith(Object.assign(document.createElement("div"),{className:"cv-ava fallback",role:"img",textContent:"AJ"}));};}
+    /* profile in GitHub section */
     var p=document.getElementById("ghProfile");
     if(p){p.innerHTML='<img src="'+u.avatar_url+'" alt="avatar"><div><div style="font-family:var(--mono);color:var(--text);font-size:15px">@'+u.login+'</div><div style="color:var(--muted);font-size:13px;margin:3px 0 8px">'+(u.bio||"Studente · sviluppo &amp; cybersecurity")+'</div><div class="gh-stats"><div><b>'+u.public_repos+'</b>repository</div><div><b>'+u.followers+'</b>follower</div></div></div>';}
-  }).catch(function(){});
+  }).catch(function(){
+    /* fallback: show AJ monogram */
+    var av=document.getElementById("cvAva");
+    if(av){var fb=document.createElement("div");fb.className="cv-ava fallback";fb.setAttribute("role","img");fb.textContent="AJ";av.replaceWith(fb);}
+  });
 
   var PINS=["Esame","structura","Law-based-game","study-tracker","quiz-patente","CV"];
   var DESC={"esame":"Simulatore d'esame di maturità con AI · 4 provider","structura":"Analizzatore di strutture organizzative con AI","law-based-game":"Gioco a tema giuridico, creato con l'AI","study-tracker":"Tracker di studio orientato ai progetti","quiz-patente":"App di quiz per la patente B","cv":"Il mio curriculum come sito web"};
